@@ -79,4 +79,8 @@ public class PurchaseRequestLineItem {
 		return "PurchaceRequestLineItem [id=" + id + ", purchaceRequest=" + purchaceRequest + ", product="
 				+ product + ", quantity=" + quantity + "]";
 	}
+	
+	
+	
+	
 }
