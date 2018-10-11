@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.prs.business.product.Product;
@@ -33,8 +33,8 @@ public class ProductController {
 		}
 	}
 	
-	@GetMapping("/Get/{id}")
-	public @ResponseBody JsonResponse getProduct(@PathVariable int id) {
+	@GetMapping("/Get")
+	public @ResponseBody JsonResponse getProduct(@RequestParam int id) {
 		try {
 			Optional<Product> product = productRepository.findById(id);
 			if (product.isPresent())

@@ -5,7 +5,6 @@
 <fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.ResponseBody"/>
 <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.GetMapping"/>
-<fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestParam"/>
 <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.PostMapping"/>
 <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestBody"/>
 <fullyQualifiedTypeName name="com.prs.business.vendor.VendorRepository"/>
@@ -30,4 +29,5 @@
 <fullyQualifiedTypeName name="com.prs.business.product.Product"/>
 <fullyQualifiedTypeName name="com.prs.business.purchaserequest.PurchaseRequestLineItemRepository"/>
 <fullyQualifiedTypeName name="com.prs.business.purchaserequest.PurchaseRequestLineItem"/>
+<fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestParam"/>
 </qualifiedTypeNameHistroy>
