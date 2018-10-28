@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import com.prs.business.purchaserequest.PurchaseRequest;
 import com.prs.business.purchaserequest.PurchaseRequestRepository;
 import com.prs.util.JsonResponse;
 
+@CrossOrigin
 @Controller 
 @RequestMapping("/PurchaseRequests")
 public class PurchaseRequestController {
@@ -29,7 +31,7 @@ public class PurchaseRequestController {
 			return JsonResponse.getInstance(purchaseRequestRepository.findAll());
 		}
 		catch (Exception e) {
-			return JsonResponse.getErrorInstance("User list failure:"+e.getMessage(), e);
+			return JsonResponse.getErrorInstance("PurchaseRequest list failure:"+e.getMessage(), e);
 		}
 	}
 	
@@ -40,10 +42,10 @@ public class PurchaseRequestController {
 			if (purchaseRequest.isPresent())
 				return JsonResponse.getInstance(purchaseRequest.get());
 			else
-				return JsonResponse.getErrorInstance("User not found for id: "+id, null);
+				return JsonResponse.getErrorInstance("PurchaseRequest not found for id: "+id, null);
 		}
 		catch (Exception e) {
-			return JsonResponse.getErrorInstance("Error getting user:  "+e.getMessage(), null);
+			return JsonResponse.getErrorInstance("Error getting purchaseRequest:  "+e.getMessage(), null);
 		}
 	}
 
@@ -77,5 +79,4 @@ public class PurchaseRequestController {
 			return JsonResponse.getErrorInstance(ex.getMessage(), ex);
 		}
 	}
-
 }

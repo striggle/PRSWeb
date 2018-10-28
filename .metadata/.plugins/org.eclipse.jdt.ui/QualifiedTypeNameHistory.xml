@@ -30,4 +30,5 @@
 <fullyQualifiedTypeName name="com.prs.business.purchaserequest.PurchaseRequestLineItemRepository"/>
 <fullyQualifiedTypeName name="com.prs.business.purchaserequest.PurchaseRequestLineItem"/>
 <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestParam"/>
+<fullyQualifiedTypeName name="org.springframework.web.bind.annotation.CrossOrigin"/>
 </qualifiedTypeNameHistroy>

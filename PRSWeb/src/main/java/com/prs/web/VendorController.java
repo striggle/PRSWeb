@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import com.prs.business.vendor.Vendor;
 import com.prs.business.vendor.VendorRepository;
 import com.prs.util.JsonResponse;
 
+@CrossOrigin
 @Controller 
 @RequestMapping("/Vendors") 
 public class VendorController {
@@ -29,7 +31,7 @@ public class VendorController {
 			return JsonResponse.getInstance(vendorRepository.findAll());
 		}
 		catch (Exception e) {
-			return JsonResponse.getErrorInstance("User list failure:"+e.getMessage(), e);
+			return JsonResponse.getErrorInstance("Vendor list failure:"+e.getMessage(), e);
 		}
 	}
 	
@@ -40,10 +42,10 @@ public class VendorController {
 			if (vendor.isPresent())
 				return JsonResponse.getInstance(vendor.get());
 			else
-				return JsonResponse.getErrorInstance("User not found for id: "+id, null);
+				return JsonResponse.getErrorInstance("Vendor not found for id: "+id, null);
 		}
 		catch (Exception e) {
-			return JsonResponse.getErrorInstance("Error getting user:  "+e.getMessage(), null);
+			return JsonResponse.getErrorInstance("Error getting vendor:  "+e.getMessage(), null);
 		}
 	}
 
