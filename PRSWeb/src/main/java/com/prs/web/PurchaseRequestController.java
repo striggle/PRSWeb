@@ -1,5 +1,6 @@
 package com.prs.web;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +43,10 @@ public class PurchaseRequestController {
 			if (purchaseRequest.isPresent())
 				return JsonResponse.getInstance(purchaseRequest.get());
 			else
-				return JsonResponse.getErrorInstance("PurchaseRequest not found for id: "+id, null);
+				return JsonResponse.getErrorInstance("PurchaseRequest not found for id: "+id);
 		}
 		catch (Exception e) {
-			return JsonResponse.getErrorInstance("Error getting purchaseRequest:  "+e.getMessage(), null);
+			return JsonResponse.getErrorInstance("Error getting purchaseRequest:  "+e.getMessage(), e);
 		}
 	}
 
@@ -78,5 +79,33 @@ public class PurchaseRequestController {
 		} catch (Exception ex) {
 			return JsonResponse.getErrorInstance(ex.getMessage(), ex);
 		}
+	}
+	
+	@GetMapping("/ListReview")
+	public @ResponseBody Iterable<PurchaseRequest> getAllPurchaseRequestsForReview(@RequestParam int id) {
+		Iterable<PurchaseRequest> reviewPRs =purchaseRequestRepository.findAllByUserIdNotAndStatus(id, "Review");
+		return reviewPRs;
+	}
+	
+	@PostMapping("/SubmitForReview") 
+	public @ResponseBody JsonResponse submitForReview (@RequestBody PurchaseRequest pr) {
+		if (pr.getTotal()<=50)
+			pr.setStatus(PurchaseRequest.STATUS_APPROVED);
+		else
+			pr.setStatus(PurchaseRequest.STATUS_REVIEW);
+		pr.setSubmittedDate(LocalDateTime.now());
+		return savePurchaseRequest(pr);
+	}
+	
+	@PostMapping("/ApprovePR") 
+	public @ResponseBody JsonResponse approvePR (@RequestBody PurchaseRequest pr) {
+		pr.setStatus(PurchaseRequest.STATUS_APPROVED);
+		return savePurchaseRequest(pr);
+	}
+
+	@PostMapping("/RejectPR") 
+	public @ResponseBody JsonResponse rejectPR (@RequestBody PurchaseRequest pr) {
+		pr.setStatus(PurchaseRequest.STATUS_REJECTED);
+		return savePurchaseRequest(pr);
 	}
 }

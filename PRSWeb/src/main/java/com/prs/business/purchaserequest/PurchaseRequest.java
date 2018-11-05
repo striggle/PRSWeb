@@ -28,6 +28,11 @@ public class PurchaseRequest {
 	private double total;
 	private LocalDateTime submittedDate;
 	private String reasonForRejection;
+	public static final String STATUS_NEW = "New";
+	public static final String STATUS_REVIEW = "Review";
+	public static final String STATUS_EDIT = "Edit";
+	public static final String STATUS_APPROVED = "Approved";
+	public static final String STATUS_REJECTED = "Rejected";
 	
 	public PurchaseRequest(int id, User user, String description, String justification, LocalDateTime dateNeeded,
 			String deliveryMode, String status, double total, LocalDateTime submittedDate, String reasonForRejection) {
@@ -74,7 +79,7 @@ public class PurchaseRequest {
 		return user;
 	}
 
-	public void setUserId(User user) {
+	public void setUser(User user) {
 		this.user = user;
 	}
 

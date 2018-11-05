@@ -1,7 +1,9 @@
 package com.prs.business.purchaserequest;
 
-import org.springframework.data.repository.CrudRepository;
+import java.util.List;
 
-public interface PurchaseRequestLineItemRepository extends CrudRepository<PurchaseRequestLineItem, Integer> {
+import org.springframework.data.jpa.repository.JpaRepository;
 
+public interface PurchaseRequestLineItemRepository extends JpaRepository<PurchaseRequestLineItem, Integer> {
+	List<PurchaseRequestLineItem> findAllByPurchaseRequestId(int purchaseRequestId);
 }

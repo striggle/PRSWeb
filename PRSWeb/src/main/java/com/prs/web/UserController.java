@@ -22,6 +22,22 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@PostMapping("/Login")
+	public @ResponseBody JsonResponse authenticate(@RequestBody User user) {
+		try {
+			User u = userRepository.findByUserNameAndPassword(user.getUserName(), 
+															  user.getPassword());
+			if (u!=null)
+				return JsonResponse.getInstance(u);
+			else
+				return JsonResponse.getErrorInstance("User not found for username:  "+user.getUserName());
+		}
+		catch(Exception e) {
+			return JsonResponse.getErrorInstance("Error authenticating username:  "+user.getUserName() + ".  Exception msg: " + 
+													e.getMessage(), e);
+		}
+	}
+	
 	@GetMapping("/List")
 	public @ResponseBody JsonResponse getAllUsers() {
 		try {	
@@ -39,10 +55,10 @@ public class UserController {
 			if (user.isPresent())
 				return JsonResponse.getInstance(user.get());
 			else
-				return JsonResponse.getErrorInstance("User not found for id: "+id, null);
+				return JsonResponse.getErrorInstance("User not found for id: "+id);
 		}
 		catch (Exception e) {
-			return JsonResponse.getErrorInstance("Error getting user:  "+e.getMessage(), null);
+			return JsonResponse.getErrorInstance("Error getting user:  "+e.getMessage(), e);
 		}
 	}
 

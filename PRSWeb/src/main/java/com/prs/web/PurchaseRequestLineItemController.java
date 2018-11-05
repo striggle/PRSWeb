@@ -1,5 +1,7 @@
 package com.prs.web;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +15,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.prs.business.product.Product;
+import com.prs.business.product.ProductRepository;
+import com.prs.business.purchaserequest.PurchaseRequest;
 import com.prs.business.purchaserequest.PurchaseRequestLineItem;
 import com.prs.business.purchaserequest.PurchaseRequestLineItemRepository;
+import com.prs.business.purchaserequest.PurchaseRequestRepository;
 import com.prs.util.JsonResponse;
 
 @CrossOrigin
-@Controller 
+@Controller
 @RequestMapping("/PurchaseRequestLineItems")
 public class PurchaseRequestLineItemController {
-	@Autowired 
-	private PurchaseRequestLineItemRepository purchaseRequestLineItemRepository;
+	@Autowired
+	private PurchaseRequestLineItemRepository prliRepository;
+	@Autowired
+	private PurchaseRequestRepository prRepository;
+	@Autowired
+	private ProductRepository prodRepository;
 	
 	@GetMapping("/List")
 	public @ResponseBody JsonResponse getAllPurchaseRequestLineItems() {
 		try {	
-			return JsonResponse.getInstance(purchaseRequestLineItemRepository.findAll());
+			return JsonResponse.getInstance(prliRepository.findAll());
 		}
 		catch (Exception e) {
 			return JsonResponse.getErrorInstance("PurchaseRequestLineItem list failure:"+e.getMessage(), e);
@@ -37,30 +47,94 @@ public class PurchaseRequestLineItemController {
 	@GetMapping("/Get")
 	public @ResponseBody JsonResponse getPurchaseRequestLineItem(@RequestParam int id) {
 		try {
-			Optional<PurchaseRequestLineItem> purchaseRequestLineItem = purchaseRequestLineItemRepository.findById(id);
+			Optional<PurchaseRequestLineItem> purchaseRequestLineItem = prliRepository.findById(id);
 			if (purchaseRequestLineItem.isPresent())
 				return JsonResponse.getInstance(purchaseRequestLineItem.get());
 			else
-				return JsonResponse.getErrorInstance("PurchaseRequestLineItem not found for id: "+id, null);
+				return JsonResponse.getErrorInstance("PurchaseRequestLineItem not found for id: "+id);
 		}
 		catch (Exception e) {
-			return JsonResponse.getErrorInstance("Error getting purchaseRequestLineItem:  "+e.getMessage(), null);
+			return JsonResponse.getErrorInstance("Error getting purchaseRequestLineItem:  "+e.getMessage(), e);
 		}
 	}
 
+	@GetMapping("/LinesForPR")
+	public @ResponseBody JsonResponse getAllLineItemsForPR(@RequestParam int id) {
+		try {
+			return JsonResponse.getInstance(prliRepository.findAllByPurchaseRequestId(id));
+		}
+		catch (Exception e) {
+			return JsonResponse.getErrorInstance("Error getting lines for purchaseRequest id:  "+id+", Exception msg: "+e.getMessage(), e);
+		}
+	}
+	
 	@PostMapping("/Add")
-	public @ResponseBody JsonResponse addPurchaseRequestLineItem(@RequestBody PurchaseRequestLineItem purchaseRequestLineItem) {
-		return savePurchaseRequestLineItem(purchaseRequestLineItem);
+	public @ResponseBody JsonResponse addNewPurchaseRequestLineItem (@RequestBody PurchaseRequestLineItem prli) {
+		//Session session = 
+		JsonResponse ret = null;
+		try {
+			if (prli.getProduct().getName().equals("")) {
+				// Incoming Json is not fully qualified so we need to look up the product
+				Product prod = prodRepository.findById(prli.getProduct().getId()).get();
+				prli.setProduct(prod);
+			}
+			ret = savePurchaseRequestLineItem(prli);
+			// ensure save was successful before continuing
+			// if save was not successful then pr total will be corrupt
+			if (!ret.getMessage().equals(JsonResponse.SUCCESS)) {
+				ret = JsonResponse.getErrorInstance("Failed to ADD prli.  Potential data corruption issue - purchaseRequestID = "+prli.getPurchaseRequest().getId());
+			}
+			else {
+				// update pr total
+				PurchaseRequest pr = updateRequestTotal((PurchaseRequestLineItem)ret.getData());
+				ret = JsonResponse.getInstance(pr);
+			}
+		}
+		catch (Exception e) {
+			String msg = "Add prli issue:  " + e.getMessage();
+			e.printStackTrace();
+			ret = JsonResponse.getErrorInstance(prli, msg);
+		}
+		return ret;
+	}
+	
+	@PostMapping("/Change")
+	public @ResponseBody JsonResponse updatePurchaseRequestLineItem(@RequestBody PurchaseRequestLineItem prli) {
+		JsonResponse ret = null;
+		try {
+			ret = savePurchaseRequestLineItem(prli);
+			// ensure save was successful before continuing
+			// if save was not successful then pr total will be corrupt
+			if (!ret.getMessage().equals(JsonResponse.SUCCESS)) {
+				ret = JsonResponse.getErrorInstance("Failed to UPDATE prli.  Potential data corruption issue - purchaseRequestID = "+prli.getPurchaseRequest().getId());
+			}
+		}
+		catch (Exception e) {
+			String msg = "UPDATE prli issue:  " + e.getMessage();
+			e.printStackTrace();
+			ret = JsonResponse.getErrorInstance(prli, msg);
+		}
+		return ret;
 	}
 
-	@PostMapping("/Change")
-	public @ResponseBody JsonResponse updatePurchaseRequestLineItem(@RequestBody PurchaseRequestLineItem purchaseRequestLineItem) {
-		return savePurchaseRequestLineItem(purchaseRequestLineItem);
+	@PostMapping("/Remove")
+	public @ResponseBody JsonResponse removePurchaseRequestLineItem(@RequestBody PurchaseRequestLineItem prli) {
+		JsonResponse ret = null;
+		try {
+			prliRepository.delete(prli);
+			ret = JsonResponse.getInstance(updateRequestTotal(prli));
+		}
+		catch (Exception e) {
+			String msg = "DELETE prli issue:  " + e.getMessage();
+			e.printStackTrace();
+			ret = JsonResponse.getErrorInstance(prli, msg);
+		}
+		return ret;
 	}
 
 	private @ResponseBody JsonResponse savePurchaseRequestLineItem(@RequestBody PurchaseRequestLineItem purchaseRequestLineItem) {
 		try {
-			purchaseRequestLineItemRepository.save(purchaseRequestLineItem);
+			purchaseRequestLineItem = prliRepository.saveAndFlush(purchaseRequestLineItem);
 			return JsonResponse.getInstance(purchaseRequestLineItem);
 		} catch (DataIntegrityViolationException ex) {
 			return JsonResponse.getErrorInstance(ex.getRootCause().toString(), ex);
@@ -69,13 +143,29 @@ public class PurchaseRequestLineItemController {
 		}
 	}
 	
-	@PostMapping("/Remove")
-	public @ResponseBody JsonResponse removeUser(@RequestBody PurchaseRequestLineItem purchaseRequestLineItem) {
-		try {
-			purchaseRequestLineItemRepository.delete(purchaseRequestLineItem);
-			return JsonResponse.getInstance(purchaseRequestLineItem);
-		} catch (Exception ex) {
-			return JsonResponse.getErrorInstance(ex.getMessage(), ex);
+	private PurchaseRequest updateRequestTotal(PurchaseRequestLineItem prli) throws Exception {
+		
+		// Since the PR associated with the line item is likely not fully qualified in Json,
+		// get PurchaseRequest associated with the changed line item
+		Optional<PurchaseRequest> prOpt = prRepository.findById(prli.getPurchaseRequest().getId());		
+		PurchaseRequest pr = prOpt.get();
+
+		// build list of all prli's
+		List<PurchaseRequestLineItem> lines = new ArrayList<>();
+		lines = prliRepository.findAllByPurchaseRequestId(pr.getId());
+		
+		// loop through the prli's and:
+		// 1)  calculate the prli total
+		// 2)  add the prli total to the sum
+		double sum = 0;
+		for (PurchaseRequestLineItem line: lines) {
+			Product p = line.getProduct();
+			double lineTotal = line.getQuantity()*p.getPrice();
+			sum += lineTotal;
 		}
+		pr.setTotal(sum);
+		return prRepository.save(pr);
+	
 	}
+
 }

@@ -139,4 +139,8 @@ public class Vendor {
 				+ ", state=" + state + ", zip=" + zip + ", phoneNumber=" + phoneNumber + ", email=" + email
 				+ ", isPreapproved=" + isPreapproved + "]";
 	}
+	
+	public String getSummary() {
+		return "Vendor code=" + code + ", Vendor Name = " + name;
+	}
 }

@@ -17,16 +17,16 @@ public class PurchaseRequestLineItem {
 	private int id;
 	@ManyToOne
 	@JoinColumn(name = "purchaseRequestId")
-	private PurchaseRequest purchaceRequest;
+	private PurchaseRequest purchaseRequest;
 	@ManyToOne
 	@JoinColumn(name = "productId")
 	private Product product;
 	private int quantity;
 	
-	public PurchaseRequestLineItem(int id, PurchaseRequest purchaceRequest, Product product, int quantity) {
+	public PurchaseRequestLineItem(int id, PurchaseRequest purchaseRequest, Product product, int quantity) {
 		super();
 		this.id = id;
-		this.purchaceRequest = purchaceRequest;
+		this.purchaseRequest = purchaseRequest;
 		this.product = product;
 		this.quantity = quantity;
 	}
@@ -35,9 +35,9 @@ public class PurchaseRequestLineItem {
 		super();
 	}
 
-	public PurchaseRequestLineItem(PurchaseRequest purchaceRequest, Product product, int quantity) {
+	public PurchaseRequestLineItem(PurchaseRequest purchaseRequest, Product product, int quantity) {
 		super();
-		this.purchaceRequest = purchaceRequest;
+		this.purchaseRequest = purchaseRequest;
 		this.product = product;
 		this.quantity = quantity;
 	}
@@ -50,12 +50,12 @@ public class PurchaseRequestLineItem {
 		this.id = id;
 	}
 
-	public PurchaseRequest getPurchaceRequest() {
-		return purchaceRequest;
+	public PurchaseRequest getPurchaseRequest() {
+		return purchaseRequest;
 	}
 
-	public void setPurchaceRequest(PurchaseRequest purchaceRequest) {
-		this.purchaceRequest = purchaceRequest;
+	public void setPurchaseRequest(PurchaseRequest purchaseRequest) {
+		this.purchaseRequest = purchaseRequest;
 	}
 
 	public Product getProduct() {
@@ -76,7 +76,7 @@ public class PurchaseRequestLineItem {
 
 	@Override
 	public String toString() {
-		return "PurchaceRequestLineItem [id=" + id + ", purchaceRequest=" + purchaceRequest + ", product="
+		return "PurchaceRequestLineItem [id=" + id + ", purchaceRequest=" + purchaseRequest + ", product="
 				+ product + ", quantity=" + quantity + "]";
 	}
 }

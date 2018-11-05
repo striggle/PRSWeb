@@ -1,5 +1,2 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<typeInfoHistroy>
-<typeInfo handle="=PRSWeb/C:\/Users\/Max-Student\/.m2\/repository\/org\/springframework\/data\/spring-data-jpa\/2.0.10.RELEASE\/spring-data-jpa-2.0.10.RELEASE.jar&lt;org.springframework.data.jpa.repository.support(CrudMethodMetadata.class[CrudMethodMetadata" modifiers="1537" timestamp="1538076799397"/>
-<typeInfo handle="=PRSWeb/C:\/Users\/Max-Student\/.m2\/repository\/org\/springframework\/data\/spring-data-commons\/2.0.10.RELEASE\/spring-data-commons-2.0.10.RELEASE.jar&lt;org.springframework.data.repository(CrudRepository.class[CrudRepository" modifiers="1537" timestamp="1538076799834"/>
-</typeInfoHistroy>
+<typeInfoHistroy/>
